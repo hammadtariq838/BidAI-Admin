@@ -16,6 +16,9 @@ import { Route as AdminImport } from './routes/_admin'
 import { Route as AdminIndexImport } from './routes/_admin/index'
 import { Route as AuthSignInImport } from './routes/_auth/sign-in'
 import { Route as AdminCreateAccountImport } from './routes/_admin/create-account'
+import { Route as AdminLayoutImport } from './routes/_admin/_layout'
+import { Route as AdminLayoutUsersImport } from './routes/_admin/_layout/users'
+import { Route as AdminLayoutAnalyticsImport } from './routes/_admin/_layout/analytics'
 
 // Create/Update Routes
 
@@ -44,6 +47,21 @@ const AdminCreateAccountRoute = AdminCreateAccountImport.update({
   getParentRoute: () => AdminRoute,
 } as any)
 
+const AdminLayoutRoute = AdminLayoutImport.update({
+  id: '/_layout',
+  getParentRoute: () => AdminRoute,
+} as any)
+
+const AdminLayoutUsersRoute = AdminLayoutUsersImport.update({
+  path: '/users',
+  getParentRoute: () => AdminLayoutRoute,
+} as any)
+
+const AdminLayoutAnalyticsRoute = AdminLayoutAnalyticsImport.update({
+  path: '/analytics',
+  getParentRoute: () => AdminLayoutRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -55,6 +73,10 @@ declare module '@tanstack/react-router' {
     '/_auth': {
       preLoaderRoute: typeof AuthImport
       parentRoute: typeof rootRoute
+    }
+    '/_admin/_layout': {
+      preLoaderRoute: typeof AdminLayoutImport
+      parentRoute: typeof AdminImport
     }
     '/_admin/create-account': {
       preLoaderRoute: typeof AdminCreateAccountImport
@@ -68,13 +90,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexImport
       parentRoute: typeof AdminImport
     }
+    '/_admin/_layout/analytics': {
+      preLoaderRoute: typeof AdminLayoutAnalyticsImport
+      parentRoute: typeof AdminLayoutImport
+    }
+    '/_admin/_layout/users': {
+      preLoaderRoute: typeof AdminLayoutUsersImport
+      parentRoute: typeof AdminLayoutImport
+    }
   }
 }
 
 // Create and export the route tree
 
 export const routeTree = rootRoute.addChildren([
-  AdminRoute.addChildren([AdminCreateAccountRoute, AdminIndexRoute]),
+  AdminRoute.addChildren([
+    AdminLayoutRoute.addChildren([
+      AdminLayoutAnalyticsRoute,
+      AdminLayoutUsersRoute,
+    ]),
+    AdminCreateAccountRoute,
+    AdminIndexRoute,
+  ]),
   AuthRoute.addChildren([AuthSignInRoute]),
 ])
 

@@ -8,6 +8,7 @@ import {
 import {
   BaseResponse,
   UserResponse,
+  UsersResponse,
 } from '@/types/response.type';
 import {
   LoginUserRequest,
@@ -52,6 +53,7 @@ export const userApiSlice = createApi({
         method: 'POST',
         body,
       }),
+      invalidatesTags: ['User'],
     }),
     signin: builder.mutation<
       UserResponse,
@@ -79,7 +81,7 @@ export const userApiSlice = createApi({
         body: data,
       }),
     }),
-    getUsers: builder.query({
+    getUsers: builder.query<UsersResponse, void>({
       query: () => ({
         url: USERS_URL,
       }),
